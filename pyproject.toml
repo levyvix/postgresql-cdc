@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "send-data-to-postgresql"
+version = "0.1.0"
+description = ""
+authors = ["levyvix <levy.vix@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+psycopg2-binary = "^2.9.9"
+faker = "^26.0.0"
+sqlalchemy = "^2.0.31"
+python-dotenv = "^1.0.1"
+faker-commerce = "^1.0.4"
+schedule = "^1.2.2"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
