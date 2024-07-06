@@ -55,7 +55,16 @@ def generate_incremental_data(n_orders=5, n_users=3, n_products=2):
 
 
 if __name__ == "__main__":
-    schedule.every(5).minutes.do(generate_incremental_data)
+    manual = True
 
-    while True:
-        schedule.run_pending()
+    if manual:
+        generate_incremental_data(n_orders=1, n_users=1, n_products=1)
+    else:
+        schedule.every(1).minutes.do(
+            generate_incremental_data, n_orders=1, n_users=1, n_products=1
+        )
+
+        while True:
+            schedule.run_pending()
+
+    # generate_incremental_data(n_orders=1, n_users=1, n_products=1)
