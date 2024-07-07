@@ -7,12 +7,10 @@ import schedule
 
 def generate_incremental_data(n_orders=5, n_users=3, n_products=2):
     with engine.connect() as conn:
-        # Generate new data
         new_users, new_products, new_orders = generate_data(
             n_orders=n_orders, n_users=n_users, n_products=n_products
         )
 
-        # Check existing data
         existing_users = conn.execute(
             text("SELECT id, name, email, password FROM sales.users")
         ).fetchall()
@@ -33,7 +31,6 @@ def generate_incremental_data(n_orders=5, n_users=3, n_products=2):
         ).fetchall()
         existing_orders = set((order[0], order[1]) for order in existing_orders)
 
-        # Resolve conflict
         new_users = [
             user
             for user in new_users
@@ -50,21 +47,18 @@ def generate_incremental_data(n_orders=5, n_users=3, n_products=2):
             if (order["user_id"], order["product_id"]) not in existing_orders
         ]
 
-        # Insert new data
         insert_data(conn, new_users, new_products, new_orders)
 
 
 if __name__ == "__main__":
-    manual = True
+    manual = False
 
     if manual:
         generate_incremental_data(n_orders=1, n_users=1, n_products=1)
     else:
-        schedule.every(1).minutes.do(
+        schedule.every(5).minutes.do(
             generate_incremental_data, n_orders=1, n_users=1, n_products=1
         )
 
         while True:
             schedule.run_pending()
-
-    # generate_incremental_data(n_orders=1, n_users=1, n_products=1)
