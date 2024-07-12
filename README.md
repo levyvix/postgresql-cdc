@@ -187,4 +187,10 @@ Response: ['exampledb-connector']
 A partir de agora o kafka está escutando cada alteração no database "levicdc", cada insert, update e delete está sendo enviada para o kafka.
 
 
-Para verificar os dados entrando, podemos configurar um consumer em Python 
+Para verificar os dados entrando, podemos configurar um consumer em Python
+
+- [consumer.py](kafka/consumer.py)
+- [consumer.ipynb](kafka/consumer.ipynb)
+
+O script está configurado para ler todas as mensagens do topico, desde a sua criação, caso queira ler somente as mensagens chegando, mude `auto_offset_reset` para `latest`.
+
