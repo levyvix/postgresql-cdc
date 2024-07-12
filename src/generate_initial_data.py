@@ -55,26 +55,32 @@ def insert_data(conn, users, products, orders):
 
     # Insert Users
     for user in users:
-        sql = text("""
+        sql = text(
+            """
       INSERT INTO sales.users (name, email, password)
       VALUES (:name, :email, :password);
-    """)
+    """
+        )
         conn.execute(sql, user)
 
     # Insert Products
     for product in products:
-        sql = text("""
+        sql = text(
+            """
       INSERT INTO sales.products (name, price)
       VALUES (:name, :price);
-    """)
+    """
+        )
         conn.execute(sql, product)
 
     # Insert Orders
     for order in orders:
-        sql = text("""
+        sql = text(
+            """
       INSERT INTO sales.orders (user_id, product_id, quantity)
       VALUES (:user_id, :product_id, :quantity);
-    """)
+    """
+        )
         conn.execute(sql, order)
 
     # Commit changes to the database
