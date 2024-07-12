@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
+/docker/minio
 .env
 # Distribution / packaging
 .Python
