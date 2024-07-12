@@ -8,6 +8,6 @@
         "database.user": "levi",
         "database.password": "levi",
         "database.dbname": "levicdc",
-        "database.server.name": "postgres"
+        "topic.prefix": "cdc"
     }
 }
