@@ -21,6 +21,9 @@ avro-python3 = "^1.10.2"
 py-ccloud = "^0.1.2"
 requests = "^2.32.3"
 
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
