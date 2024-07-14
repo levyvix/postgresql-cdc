@@ -1,3 +1,5 @@
+from rich import print
+
 from kafka import KafkaConsumer
 
 consumer = KafkaConsumer(
@@ -6,9 +8,11 @@ consumer = KafkaConsumer(
     enable_auto_commit=False,
 )
 
+# print(consumer.topics())
+
 consumer.subscribe(
     [
-        "cdc.sales.orders",
+        "cdc-.sales.orders",
     ]  # "cdc.sales.products", "cdc.sales.orders"]
 )
 

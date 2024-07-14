@@ -1,8 +1,7 @@
-from db import engine
-
-from generate_initial_data import insert_data, generate_data
-from sqlalchemy import text
 import schedule
+from db import engine
+from generate_initial_data import generate_data, insert_data
+from sqlalchemy import text
 
 
 def generate_incremental_data(n_orders=5, n_users=3, n_products=2):
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     if manual:
         generate_incremental_data(n_orders=1, n_users=1, n_products=1)
     else:
-        schedule.every(5).minutes.do(
+        schedule.every(5).seconds.do(
             generate_incremental_data, n_orders=1, n_users=1, n_products=1
         )
 

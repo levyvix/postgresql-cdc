@@ -68,6 +68,130 @@ services:
     entrypoint: >
       /bin/sh -c "  /usr/bin/mc config host add myminio http://minio:9000 minio minio123; /usr/bin/mc rm -r --force myminio/commerce;  /usr/bin/mc mb myminio/commerce;  /usr/bin/mc policy download myminio/commerce;  /usr/bin/mc cp /tmp/data myminio/commerce; exit 0;  "
 
+  dremio:
+    platform: linux/x86_64
+    image: dremio/dremio-oss:latest
+    depends_on:
+      - nessie
+    ports:
+      - 9047:9047
+      - 31010:31010
+      - 32010:32010
+    container_name: dremio
+
+  # spark_notebook:
+  #   image: alexmerced/spark33-notebook
+  #   ports:
+  #     - 8888:8888
+  #   env_file: .env
+  #   depends_on:
+  #     - minio
+  #     - nessie
+  #   container_name: notebook
+
+  spark-master:
+    container_name: spark-master1
+    image: owshq-spark:3.5
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+      - SPARK_LOG_CONF=/opt/bitnami/spark/conf/log4j2.properties
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${APP_SRC_PATH}:/opt/bitnami/spark/jobs
+
+  # Spark Workers
+  spark-worker-1:
+    container_name: spark-worker-1-levi
+    image: owshq-spark:3.5
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=3G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+      - SPARK_LOG_CONF=/opt/bitnami/spark/conf/log4j2.properties
+    volumes:
+      - ${APP_SRC_PATH}:/opt/bitnami/spark/jobs
+    depends_on:
+      - spark-master
+
+  spark-worker-2:
+    container_name: spark-worker-2-levi
+    image: owshq-spark:3.5
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=3G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+      - SPARK_LOG_CONF=/opt/bitnami/spark/conf/log4j2.properties
+    volumes:
+      - ${APP_SRC_PATH}:/opt/bitnami/spark/jobs
+    depends_on:
+      - spark-master
+
+  spark-worker-3:
+    container_name: spark-worker-3-levi
+    image: owshq-spark:3.5
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=3G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+      - SPARK_LOG_CONF=/opt/bitnami/spark/conf/log4j2.properties
+    volumes:
+      - ${APP_SRC_PATH}:/opt/bitnami/spark/jobs
+    depends_on:
+      - spark-master
+
+  # Spark History Server
+  spark-history-server:
+    container_name: spark-history-server-levi
+    image: owshq-spark-history-server:3.5
+    environment:
+      - SPARK_HISTORY_UI_PORT=18080
+      - SPARK_DAEMON_MEMORY=5g
+      - SPARK_HISTORY_RETAINEDAPPLICATIONS=100
+      - SPARK_HISTORY_UI_MAXAPPLICATIONS=50
+      - SPARK_HISTORY_STORE_MAXDISKUSAGE=20g
+      - SPARK_HISTORY_FS_LOG_DIRECTORY=/opt/bitnami/spark/logs/events
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/opt/bitnami/spark/logs/events
+      - SPARK_LOG_CONF=/opt/bitnami/spark/conf/log4j2.properties
+    ports:
+      - 18080:18080
+      - 4040:4040
+    depends_on:
+      - spark-master
+      - spark-worker-1
+      - spark-worker-2
+
+  nessie:
+    image: projectnessie/nessie
+    container_name: nessie
+    depends_on:
+      - minio
+    ports:
+      - "19120:19120"
+
 volumes:
   zookeeper_data:
     driver: local

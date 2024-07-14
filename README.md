@@ -116,7 +116,7 @@ Este comando irá iniciar os containers em segundo plano para criar um ambiente 
 	- **Links**:
 	- `zookeeper:zookeeper`
 	- `kafka:kafka`
-	- **Dependências**: 
+	- **Dependências**:
 	- `zookeeper`
 	- `kafka`
 	- **Importância**: Kafka Connect é uma ferramenta para importar e exportar dados de forma confiável entre Kafka e outros sistemas.
@@ -194,3 +194,37 @@ Para verificar os dados entrando, podemos configurar um consumer em Python
 
 O script está configurado para ler todas as mensagens do topico, desde a sua criação, caso queira ler somente as mensagens chegando, mude `auto_offset_reset` para `latest`.
 
+## Configurando o Kafka Connect para enviar os dados para o Minio/S3
+
+Para enviar os dados para o Minio, é necessário configurar um novo conector no Kafka Connect.
+
+### Exemplo de requisição:
+
+Para enviar uma configuração de conector S3:
+
+```bash
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d '{
+  "name": "s3-sink",
+  "config": {
+    "connector.class": "io.aiven.kafka.connect.s3.AivenKafkaConnectS3SinkConnector",
+    "aws.access.key.id": "minio",
+    "aws.secret.access.key": "minio123",
+    "aws.s3.bucket.name": "commerce",
+    "aws.s3.endpoint": "http://minio:9000",
+    "aws.s3.region": "us-east-1",
+    "format.output.type": "jsonl",
+    "topics": "cdc-.sales.orders, cdc-.sales.products, cdc-.sales.users",
+    "file.compression.type": "none",
+    "flush.size": "20",
+    "file.name.template": "/{{topic}}/{{timestamp:unit=yyyy}}-{{timestamp:unit=MM}}-{{timestamp:unit=dd}}/{{timestamp:unit=HH}}/{{partition:padding=true}}-{{start_offset:padding=true}}.json"
+  }
+}'
+```
+
+Isso fará com que o Kafka Connect envie os dados dos tópicos `cdc-.sales.orders`, `cdc-.sales.products` e `cdc-.sales.users` para o bucket `commerce` no Minio.
+
+Para verificar se recebeu a configuração:
+
+```bash
+curl -i -X GET -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/
+```
