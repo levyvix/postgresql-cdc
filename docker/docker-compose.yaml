@@ -68,16 +68,16 @@ services:
     entrypoint: >
       /bin/sh -c "  /usr/bin/mc config host add myminio http://minio:9000 minio minio123; /usr/bin/mc rm -r --force myminio/commerce;  /usr/bin/mc mb myminio/commerce;  /usr/bin/mc policy download myminio/commerce;  /usr/bin/mc cp /tmp/data myminio/commerce; exit 0;  "
 
-  dremio:
-    platform: linux/x86_64
-    image: dremio/dremio-oss:latest
-    depends_on:
-      - nessie
-    ports:
-      - 9047:9047
-      - 31010:31010
-      - 32010:32010
-    container_name: dremio
+  # dremio:
+  #   platform: linux/x86_64
+  #   image: dremio/dremio-oss:latest
+  #   depends_on:
+  #     - nessie
+  #   ports:
+  #     - 9047:9047
+  #     - 31010:31010
+  #     - 32010:32010
+  #   container_name: dremio
 
   # spark_notebook:
   #   image: alexmerced/spark33-notebook

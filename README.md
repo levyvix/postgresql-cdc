@@ -69,11 +69,12 @@ python3 main.py
 ```
 
 ## Subindo o cluster do Kafka
+
 Da pasta raíz
 
 ```bash
 cd docker
-docker compose up -d
+docker compose -f docker-compose-kafka.yaml up -d
 ```
 
 Este comando irá iniciar os containers em segundo plano para criar um ambiente de desenvolvimento que inclui o Kafka, Zookeeper, MinIO e um serviço de criação de buckets.
@@ -84,35 +85,17 @@ Este comando irá iniciar os containers em segundo plano para criar um ambiente 
 	- **Imagem**: `docker.io/bitnami/zookeeper:3.8`
 	- **Portas**: `2181:2181`
 	- **Volumes**: `zookeeper_data:/bitnami`
-	- **Variáveis de Ambiente**: `ALLOW_ANONYMOUS_LOGIN=yes`
 	- **Importância**: O Zookeeper é usado para coordenar e gerenciar o Kafka.
 
 2. Kafka
 	- **Imagem**: `docker.io/bitnami/kafka:3.4`
 	- **Portas**: `9093:9093`
-	- **Volumes**: `kafka_data:/bitnami`
-	- **Variáveis de Ambiente**:
-	- `KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181`
-	- `ALLOW_PLAINTEXT_LISTENER=yes`
-	- `KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT`
-	- `KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093`
-	- `KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093`
-	- `KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT`
 	- **Dependências**: `zookeeper`
 	- **Importância**: Kafka é uma plataforma de streaming de eventos utilizada para construir pipelines de dados em tempo real e aplicativos de streaming.
 
 3. Connect
-	- **Build**:
-	- **Contexto**: `./container/connect`
-	- **Dockerfile**: `Dockerfile`
-	- **Nome do Container**: `connect`
-	- **Hostname**: `connect`
+	- **Imagem**: `debezium/connect`
 	- **Portas**: `8083:8083`
-	- **Variáveis de Ambiente**:
-	- `GROUP_ID=1`
-	- `CONFIG_STORAGE_TOPIC=my-connect-configs`
-	- `OFFSET_STORAGE_TOPIC=my-connect-offsets`
-	- `BOOTSTRAP_SERVERS=kafka:9092`
 	- **Links**:
 	- `zookeeper:zookeeper`
 	- `kafka:kafka`
@@ -124,23 +107,14 @@ Este comando irá iniciar os containers em segundo plano para criar um ambiente 
 4. Minio
 	- **Imagem**: `quay.io/minio/minio:RELEASE.2022-05-26T05-48-41Z`
 	- **Hostname**: `minio`
-	- **Nome do Container**: `minio`
 	- **Portas**: `9000:9000`, `9001:9001`
-	- **Volumes**: `./minio/data:/data`
-	- **Variáveis de Ambiente**:
-	- `MINIO_ACCESS_KEY: minio`
-	- `MINIO_SECRET_KEY: minio123`
 	- **Comando**: `server --console-address ":9001" /data`
 	- **Importância**: Minio é um armazenamento de objetos compatível com S3.
 
 5. CreateBuckets
 	- **Imagem**: `minio/mc`
-	- **Nome do Container**: `createbuckets`
 	- **Dependências**: `minio`
-	- **Entrypoint**: >
-	/bin/sh -c "  /usr/bin/mc config host add myminio http://minio:9000 minio minio123; /usr/bin/mc rm -r --force myminio/commerce;  /usr/bin/mc mb myminio/commerce;  /usr/bin/mc policy download myminio/commerce;  /usr/bin/mc cp /tmp/data myminio/commerce; exit 0;  "
 	- **Importância**: Cria buckets no Minio e aplica políticas, garantindo a preparação do ambiente de armazenamento.
-
 
 ## Configurando o Kafka Connect para ler o arquivo WAL e enviar para o cluster do Kafka
 
@@ -228,3 +202,7 @@ Para verificar se recebeu a configuração:
 ```bash
 curl -i -X GET -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/
 ```
+
+Response: ['example-db-connector', 's3-sink']
+
+# Usando o Spark para processar os dados
