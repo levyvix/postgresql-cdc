@@ -15,3 +15,5 @@ spark = (
 )
 
 spark.read.json("s3a://commerce/cdc-.sales.orders/**/**/*.json").show()
+
+spark.stop()
