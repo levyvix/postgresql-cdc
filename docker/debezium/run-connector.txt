@@ -1,6 +1,6 @@
 ### ADD POSTGRES SOURCE CONNECTOR
 
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d '{
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8093/connectors/ -d '{
     "name": "exampledb-connector",
     "config": {
         "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
@@ -12,13 +12,13 @@ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 
         "database.dbname": "levicdc",
         "topic.prefix": "cdc"
     }
-}
+}'
 
 
 ### ADD s3 sink connector
 
 
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d '{
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8093/connectors/ -d '{
   "name": "s3-sink",
   "config": {
     "connector.class": "io.aiven.kafka.connect.s3.AivenKafkaConnectS3SinkConnector",
